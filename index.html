@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selamat Ulang Tahun, Sayang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6f2;
+    --bg-2: #f3ece6;
+    --rose: #b05a6b;
+    --rose-deep: #8a3f4f;
+    --ink: #2b2426;
+    --muted: #6b5a5e;
+    --gold: #c9a96e;
+    --paper: #ffffff;
+    --shadow: 0 18px 40px rgba(43,36,38,0.12);
+    --shadow-soft: 0 8px 24px rgba(43,36,38,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; font-weight: 400; line-height: 1.7; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+  .petals { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .petal { position: absolute; top: -40px; width: 14px; height: 14px; opacity: 0.55; animation: petalFall linear forwards; }
+  .petal svg { width: 100%; height: 100%; display: block; }
+  @keyframes petalFall { 0% { transform: translate3d(0,0,0) rotate(0deg); opacity: 0; } 10% { opacity: 0.55; } 100% { transform: translate3d(var(--drift, 40px), 110vh, 0) rotate(540deg); opacity: 0; } }
+
+  .wrap { position: relative; z-index: 1; }
+  section { padding: 80px 20px; }
+  .container { max-width: 1080px; margin: 0 auto; }
+
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 20px 40px; position: relative; }
+  .hero .eyebrow { font-size: 0.85rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--rose); margin-bottom: 28px; opacity: 0; animation: fadeUp 1s 0.2s forwards; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.6rem, 7vw, 5.2rem); font-weight: 600; line-height: 1.05; color: var(--ink); margin-bottom: 22px; opacity: 0; animation: fadeUp 1.1s 0.4s forwards; }
+  .hero h1 em { font-style: italic; color: var(--rose); font-weight: 400; }
+  .hero .sub { max-width: 560px; color: var(--muted); font-size: 1.05rem; margin-bottom: 44px; opacity: 0; animation: fadeUp 1.1s 0.6s forwards; }
+  .hero .scroll-hint { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); opacity: 0; animation: fadeUp 1s 1.2s forwards, bob 2s 2.2s infinite; }
+  .scroll-hint::after { content: ''; display: block; width: 1px; height: 36px; background: var(--rose); margin: 10px auto 0; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+
+  .music-bar { position: fixed; bottom: 20px; right: 20px; z-index: 50; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(176,90,107,0.2); border-radius: 999px; padding: 10px 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-soft); font-size: 0.85rem; }
+  .music-bar .label { color: var(--muted); white-space: nowrap; }
+  .music-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--rose); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s; }
+  .music-btn:hover { transform: scale(1.08); background: var(--rose-deep); }
+  .music-btn svg { width: 14px; height: 14px; }
+  .bars { display: flex; gap: 3px; align-items: flex-end; height: 16px; }
+  .bars span { width: 3px; background: var(--rose); border-radius: 2px; animation: bar 1s infinite ease-in-out; }
+  .bars span:nth-child(1){ height: 6px; animation-delay: 0s; }
+  .bars span:nth-child(2){ height: 12px; animation-delay: 0.15s; }
+  .bars span:nth-child(3){ height: 8px; animation-delay: 0.3s; }
+  .bars span:nth-child(4){ height: 14px; animation-delay: 0.45s; }
+  .music-bar.paused .bars span { animation-play-state: paused; height: 4px !important; }
+  @keyframes bar { 0%,100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+
+  .section-title { text-align: center; margin-bottom: 56px; }
+  .section-title .kicker { font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); margin-bottom: 12px; }
+  .section-title h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 600; color: var(--ink); }
+  .section-title p { color: var(--muted); max-width: 560px; margin: 14px auto 0; }
+
+  .letter { background: var(--paper); border-radius: 18px; padding: 48px 44px; box-shadow: var(--shadow); position: relative; max-width: 760px; margin: 0 auto; }
+  .letter::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--rose), var(--gold)); border-radius: 18px 18px 0 0; }
+  .letter .salute { font-family: 'Caveat', cursive; font-size: 1.6rem; color: var(--rose); margin-bottom: 18px; }
+  .letter .body { font-family: 'Playfair Display', serif; font-size: 1.15rem; line-height: 1.9; color: var(--ink); min-height: 120px; }
+  .letter .body .cursor { display: inline-block; width: 2px; height: 1.1em; background: var(--rose); vertical-align: text-bottom; animation: blink 0.9s infinite; margin-left: 2px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .letter .sign { margin-top: 32px; text-align: right; font-family: 'Caveat', cursive; font-size: 1.5rem; color: var(--rose-deep); }
+
+  .polaroids { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 34px 26px; padding: 10px 0 40px; }
+  .polaroid { background: #fff; padding: 14px 14px 20px; box-shadow: 0 12px 30px rgba(43,36,38,0.14); border-radius: 4px; transform: rotate(var(--rot, 0deg)); transition: transform 0.4s ease, box-shadow 0.4s ease; cursor: pointer; position: relative; display: flex; flex-direction: column; }
+  .polaroid:hover { transform: rotate(0deg) scale(1.04) translateY(-6px); box-shadow: 0 22px 46px rgba(43,36,38,0.2); z-index: 2; }
+  .polaroid img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; background: #eee; }
+  .polaroid .cap { margin-top: 14px; font-family: 'Caveat', cursive; font-size: 1.25rem; color: var(--ink); text-align: center; line-height: 1.3; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+  .polaroid .date { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.85); padding: 2px 8px; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); border-radius: 999px; }
+
+  .reasons { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .reason { perspective: 1000px; height: 170px; cursor: pointer; }
+  .reason-inner { position: relative; width: 100%; height: 100%; transition: transform 0.7s; transform-style: preserve-3d; }
+  .reason.flipped .reason-inner { transform: rotateY(180deg); }
+  .reason-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; box-shadow: var(--shadow-soft); }
+  .reason-front { background: linear-gradient(135deg, #fff, #f7eff2); border: 1px solid rgba(176,90,107,0.15); }
+  .reason-front .num { font-family: 'Playfair Display', serif; font-size: 2.4rem; color: var(--rose); line-height: 1; margin-bottom: 6px; }
+  .reason-front .hint { font-size: 0.8rem; color: var(--muted); }
+  .reason-back { background: var(--rose); color: #fff; transform: rotateY(180deg); }
+  .reason-back p { color: #fff; font-size: 0.95rem; line-height: 1.5; text-align: center; }
+
+  .envelope-wrap { max-width: 520px; margin: 0 auto; text-align: center; }
+  .envelope { width: 320px; height: 200px; margin: 0 auto 28px; position: relative; cursor: pointer; transition: transform 0.3s; }
+  .envelope:hover { transform: translateY(-4px); }
+  .env-body { position: absolute; bottom: 0; left: 0; width: 100%; height: 130px; background: #f2e3e7; border-radius: 0 0 10px 10px; box-shadow: var(--shadow-soft); }
+  .env-flap { position: absolute; top: 70px; left: 0; width: 100%; height: 70px; background: #e8d0d6; clip-path: polygon(0 0, 50% 100%, 100% 0); transform-origin: top; transition: transform 0.6s ease; z-index: 3; }
+  .envelope.open .env-flap { transform: rotateX(180deg); }
+  .env-letter { position: absolute; left: 20px; right: 20px; bottom: 20px; height: 100px; background: #fff; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: transform 0.6s ease, opacity 0.4s; padding: 14px; font-family: 'Caveat', cursive; font-size: 1.05rem; color: var(--ink); display: flex; align-items: center; justify-content: center; text-align: center; opacity: 0; }
+  .envelope.open .env-letter { transform: translateY(-90px); opacity: 1; }
+  .env-hint { color: var(--muted); font-size: 0.9rem; }
+
+  .timeline { position: relative; max-width: 820px; margin: 0 auto; padding: 20px 0; }
+  .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: linear-gradient(180deg, transparent, var(--rose), transparent); transform: translateX(-50%); }
+  .tl-item { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 24px; margin-bottom: 46px; align-items: center; }
+  .tl-item .dot { width: 14px; height: 14px; background: var(--rose); border-radius: 50%; margin: 0 auto; box-shadow: 0 0 0 6px rgba(176,90,107,0.15); }
+  .tl-card { background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: var(--shadow-soft); }
+  .tl-card .tl-date { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rose); margin-bottom: 6px; }
+  .tl-card h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin-bottom: 6px; }
+  .tl-card p { color: var(--muted); font-size: 0.95rem; }
+  .tl-item.left .tl-card { grid-column: 1; }
+  .tl-item.right .tl-card { grid-column: 3; }
+  .tl-item.left .empty { grid-column: 3; }
+  .tl-item.right .empty { grid-column: 1; }
+  @media (max-width: 720px) { .timeline::before { left: 16px; } .tl-item { grid-template-columns: 32px 1fr; gap: 16px; } .tl-item .dot { grid-column: 1; } .tl-item .tl-card { grid-column: 2 !important; } .tl-item .empty { display: none; } }
+
+  /* ---------- games ---------- */
+  .game-card { background: #fff; border-radius: 18px; padding: 32px 28px; box-shadow: var(--shadow); margin-bottom: 36px; }
+  .game-card h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--ink); margin-bottom: 6px; }
+  .game-card .desc { color: var(--muted); font-size: 0.95rem; margin-bottom: 20px; }
+  .game-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .btn { display: inline-block; padding: 12px 26px; border-radius: 999px; background: var(--rose); color: #fff; border: none; font-size: 0.9rem; letter-spacing: 0.06em; cursor: pointer; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; box-shadow: 0 10px 24px rgba(176,90,107,0.3); font-family: inherit; }
+  .btn:hover { transform: translateY(-2px); background: var(--rose-deep); }
+  .btn:active { transform: translateY(0); }
+  .btn.ghost { background: transparent; color: var(--rose); border: 1.5px solid var(--rose); box-shadow: none; }
+  .btn.ghost:hover { background: var(--rose); color: #fff; }
+  .stat { font-size: 0.9rem; color: var(--muted); }
+  .stat b { color: var(--rose-deep); }
+
+  /* catch hearts */
+  .catch-area { position: relative; height: 320px; background: linear-gradient(180deg, #f7eff2, #fff); border-radius: 12px; overflow: hidden; border: 1px solid rgba(176,90,107,0.15); }
+  .catch-heart { position: absolute; top: -40px; width: 34px; height: 34px; cursor: pointer; user-select: none; transition: transform 0.1s; animation: heartFall linear forwards; }
+  .catch-heart:hover { transform: scale(1.15); }
+  .catch-heart svg { width: 100%; height: 100%; display: block; }
+  @keyframes heartFall { to { transform: translateY(380px); } }
+  .catch-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; background: rgba(250,246,242,0.85); z-index: 5; }
+  .catch-overlay.hidden { display: none; }
+
+  /* memory match */
+  .mem-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 420px; margin: 0 auto; }
+  .mem-card { height: 90px; perspective: 800px; cursor: pointer; }
+  .mem-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; }
+  .mem-card.flipped .mem-inner { transform: rotateY(180deg); }
+  .mem-card.matched .mem-inner { transform: rotateY(180deg); }
+  .mem-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: var(--shadow-soft); }
+  .mem-front { background: linear-gradient(135deg, var(--rose), var(--rose-deep)); color: #fff; font-family: 'Playfair Display', serif; }
+  .mem-back { background: #fff; transform: rotateY(180deg); font-family: 'Caveat', cursive; font-size: 1.3rem; color: var(--rose-deep); border: 1.5px solid rgba(176,90,107,0.2); }
+
+  /* quiz */
+  .quiz-q { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin-bottom: 16px; color: var(--ink); }
+  .quiz-opts { display: grid; gap: 10px; }
+  .quiz-opt { padding: 12px 18px; border-radius: 10px; border: 1.5px solid rgba(176,90,107,0.25); background: #fff; cursor: pointer; text-align: left; transition: all 0.2s; font-size: 0.95rem; }
+  .quiz-opt:hover { border-color: var(--rose); background: #f7eff2; }
+  .quiz-opt.correct { background: #e6f4ea; border-color: #4caf50; color: #2e7d32; }
+  .quiz-opt.wrong { background: #fdecea; border-color: #e53935; color: #c62828; }
+  .quiz-opt.disabled { pointer-events: none; opacity: 0.7; }
+  .quiz-result { margin-top: 16px; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; color: var(--rose-deep); }
+
+  /* scratch card */
+  .scratch-wrap { position: relative; width: 100%; max-width: 420px; height: 180px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-soft); }
+  .scratch-reveal { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: var(--rose-deep); background: linear-gradient(135deg, #fff, #f7eff2); }
+  .scratch-canvas { position: absolute; inset: 0; cursor: grab; touch-action: none; }
+
+  /* spin wheel */
+  .wheel-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .wheel { width: 260px; height: 260px; border-radius: 50%; position: relative; border: 6px solid #fff; box-shadow: var(--shadow); background: conic-gradient(#b05a6b 0 60deg, #c9a96e 60deg 120deg, #e8a8b3 120deg 180deg, #8a3f4f 180deg 240deg, #f2c7d1 240deg 300deg, #d9a0aa 300deg 360deg); transition: transform 4s cubic-bezier(0.17,0.67,0.12,0.99); }
+  .wheel-pointer { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 22px solid var(--rose-deep); margin-bottom: -6px; z-index: 2; }
+  .wheel-labels { position: absolute; inset: 0; pointer-events: none; }
+  .wheel-labels span { position: absolute; top: 50%; left: 50%; transform-origin: 0 0; font-size: 0.7rem; color: #fff; font-weight: 600; white-space: nowrap; }
+  .wheel-result { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: var(--rose-deep); min-height: 1.4em; text-align: center; }
+
+  /* compliment */
+  .comp-box { background: linear-gradient(135deg, #fff, #f7eff2); border-radius: 12px; padding: 24px; text-align: center; min-height: 80px; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; color: var(--rose-deep); box-shadow: var(--shadow-soft); }
+
+  /* modal */
+  .modal { position: fixed; inset: 0; background: rgba(20,14,16,0.7); backdrop-filter: blur(6px); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .modal.open { opacity: 1; pointer-events: auto; }
+  .modal-card { background: #fff; border-radius: 18px; padding: 40px 36px; max-width: 620px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 30px 80px rgba(0,0,0,0.3); position: relative; }
+  .modal-card h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--rose-deep); margin-bottom: 16px; }
+  .modal-card p { font-family: 'Playfair Display', serif; font-size: 1.1rem; line-height: 1.9; color: var(--ink); margin-bottom: 14px; }
+  .modal-close { position: absolute; top: 16px; right: 20px; font-size: 1.6rem; color: var(--muted); cursor: pointer; line-height: 1; }
+
+  .surprise { text-align: center; padding: 80px 20px 120px; }
+  .surprise h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4.5vw, 3rem); margin-bottom: 18px; }
+  .surprise p { color: var(--muted); max-width: 520px; margin: 0 auto 32px; }
+  .confetti-piece { position: fixed; top: -20px; width: 8px; height: 14px; z-index: 100; pointer-events: none; animation: confettiFall 2.6s linear forwards; }
+  @keyframes confettiFall { 0% { transform: translate3d(0,0,0) rotate(0deg); opacity: 1; } 100% { transform: translate3d(var(--cx,0), 110vh, 0) rotate(720deg); opacity: 0; } }
+  .final-msg { margin-top: 40px; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.35rem; color: var(--rose-deep); opacity: 0; transform: translateY(16px); transition: opacity 0.8s, transform 0.8s; }
+  .final-msg.show { opacity: 1; transform: translateY(0); }
+
+  .lightbox { position: fixed; inset: 0; background: rgba(20,14,16,0.85); backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .lightbox.open { opacity: 1; pointer-events: auto; }
+  .lightbox img { max-width: 90vw; max-height: 85vh; border-radius: 6px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+  .lightbox .close { position: absolute; top: 24px; right: 28px; color: #fff; font-size: 2rem; cursor: pointer; line-height: 1; }
+
+  footer { text-align: center; padding: 40px 20px 80px; color: var(--muted); font-size: 0.85rem; }
+  footer .sig { font-family: 'Caveat', cursive; font-size: 1.4rem; color: var(--rose); margin-bottom: 6px; }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 600px) {
+    .letter { padding: 34px 24px; }
+    .polaroids { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px 14px; }
+    .music-bar { bottom: 12px; right: 12px; padding: 8px 12px; }
+    .music-bar .label { display: none; }
+    .mem-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="petals" id="petals"></div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">UNTUKMU YANG SANGAT AKU BANGGAKANN</div>
+    <h1>Selamat Ulang Tahun,<br><em>Nafira Anggi Kusuma Wardani</em></h1>
+    <p class="sub">Tepat pada hari ini adalah hari. yang sangat berarti bagimu, aku cuma mau bilang seberuntung apa aku ketemu anggii dan aku bangga dengan kamu karena kamu wanita hebat, tetap inget aku ya kalau kamu ngerasa cape mau ngeluh ke siapa heii ada akuu yang selalu ada buat kamu and aku bakal selalu jadi pendukung paling depan buatmu ketika kamu berhasil meraih semua impianmu.</p>
+    <div class="scroll-hint">gulir ke bawah</div>
+  </section>
+
+  <!-- LETTER -->
+  <section>
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="kicker">surat untukmu</div>
+        <h2>Kata-kata yang ingin aku sampaikan</h2>
+        <p>Aku gatau harus mengucap ini berapa kali, karena kamu sangat sangat berarti di hidup hanip, kamu memperlakukanku dengan sangat lembut mengajariku hal hal yang baik dan terimaksi udah selalu ada buat aku LOVE YOU..</p>
+      </div>
+      <div class="letter reveal">
+        <div class="salute">Sayangku,</div>
+        <div class="body" id="typewriter"></div>
+        <div class="sign">- selalu, aku</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POLAROIDS -->
+  <section>
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="kicker">kenangan kita</div>
+        <h2>Momen yang ingin aku simpan selamanya</h2>
+        <p>Foto-foto ini bukan sekadar gambar. Di setiapnya, ada cerita, tawa, dan rasa yang tidak akan pernah bisa kuulang dengan orang lain.</p>
+      </div>
+      <div class="polaroids" id="polaroids"></div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section>
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="kicker">perjalanan kita</div>
+        <h2>Hal-hal kecil yang aku ingat</h2>
+        <p>Bukan momen besar yang membuatku jatuh cinta. Justru hal-hal kecil inilah yang membuatku yakin, kamu adalah rumah.</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item left reveal">
+          <div class="tl-card"><div class="tl-date">awal</div><h3>Pertama kali kita ngobrol</h3><p>Aku tidak menyangka, obrolan biasa itu akan menjadi awal dari semua ini. Kamu membuatku merasa nyaman sejak awal.</p></div>
+          <div class="dot"></div><div class="empty"></div>
+        </div>
+        <div class="tl-item right reveal">
+          <div class="empty"></div><div class="dot"></div>
+          <div class="tl-card"><div class="tl-date">hari-hari biasa</div><h3>Saat kamu tertawa lepas</h3><p>Tawamu adalah suara favoritku. Setiap kali aku mendengarnya, rasanya dunia menjadi sedikit lebih ringan.</p></div>
+        </div>
+        <div class="tl-item left reveal">
+          <div class="tl-card"><div class="tl-date">malam</div><h3>Pesan larut malam</h3><p>Kita sering mengobrol sampai larut. Topiknya tidak penting, tapi rasanya hangat. Itu yang aku rindukan.</p></div>
+          <div class="dot"></div><div class="empty"></div>
+        </div>
+        <div class="tl-item right reveal">
+          <div class="empty"></div><div class="dot"></div>
+          <div class="tl-card"><div class="tl-date">perjalanan</div><h3>Jalan-jalan kecil kita</h3><p>Tidak perlu ke tempat mewah. Berjalan berdua, berhenti sebentar, lalu lanjut lagi. Itu sudah cukup.</p></div>
+        </div>
+        <div class="tl-item left reveal">
+          <div class="tl-card"><div class="tl-date">saat sulit</div><h3>Kamu tetap di sana</h3><p>Di hari-hari yang berat, kamu tidak pergi. Kamu tetap tinggal, dan itu berarti lebih dari apa pun.</p></div>
+          <div class="dot"></div><div class="empty"></div>
+        </div>
+        <div class="tl-item right reveal">
+          <div class="empty"></div><div class="dot"></div>
+          <div class="tl-card"><div class="tl-date">sekarang</div><h3>Hari ini, ulang tahunmu</h3><p>Semoga tahun ini membawa lebih banyak tawa, lebih banyak mimpi yang terwujud, dan lebih banyak alasan untuk bersyukur.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REASONS -->
+  <section>
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="kicker">alasan aku mencintaimu</div>
+        <h2>Klik kartu ini, satu per satu</h2>
+        <p>Aku tidak akan pernah bisa menyebutkan semuanya. Tapi setidaknya, ini beberapa di antaranya.</p>
+      </div>
+      <div class="reasons" id="reasons"></div>
+    </div>
+  </section>
+
+  <!-- ENVELOPE -->
+  <section>
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="kicker">kejutan kecil</div>
+        <h2>Buka amplop ini</h2>
+        <p>Ada satu pesan yang aku simpan khusus untuk hari ini. Klik amplopnya.</p>
+      </div>
+      <div class="envelope-wrap reveal">
+        <div class="envelope" id="envelope">
+          <div class="env-letter">Untukmu</div>
+          <div class="env-flap"></div>
+          <div class="env-body"></div>
+        </div>
+        <p class="env-hint">klik amplop untuk membuka pesan</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MINI GAMES -->
+  <section>
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="kicker">mini games</div>
+        <h2>Biar harimu lebih seru</h2>
+        <p>Karena ulang tahun tanpa permainan itu kurang lengkap. Ayo main.</p>
+      </div>
+
+      <!-- Game 1: Catch hearts -->
+      <div class="game-card reveal">
+        <h3>Tangkap Hati</h3>
+        <p class="desc">Klik hati yang jatuh sebanyak mungkin dalam 20 detik. Jangan sampai terlewat.</p>
+        <div class="game-row">
+          <button class="btn" id="catchStart">Mulai</button>
+          <span class="stat">Skor: <b id="catchScore">0</b></span>
+          <span class="stat">Waktu: <b id="catchTime">20</b>s</span>
+          <span class="stat">Terbaik: <b id="catchBest">0</b></span>
+        </div>
+        <div class="catch-area" id="catchArea">
+          <div class="catch-overlay" id="catchOverlay">
+            <p style="font-family:'Playfair Display',serif;font-style:italic;color:var(--rose-deep);">Klik Mulai untuk bermain</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game 2: Memory match -->
+      <div class="game-card reveal">
+        <h3>Cocokkan Kenangan</h3>
+        <p class="desc">Temukan pasangan kartu yang sama. Klik dua kartu, cocokkan semuanya.</p>
+        <div class="game-row">
+          <button class="btn" id="memStart">Acak Ulang</button>
+          <span class="stat">Langkah: <b id="memMoves">0</b></span>
+          <span class="stat">Pasangan: <b id="memPairs">0</b>/6</span>
+        </div>
+        <div class="mem-grid" id="memGrid"></div>
+      </div>
+
+      <!-- Game 3: Quiz -->
+      <div class="game-card reveal">
+        <h3>Kuis Kecil Untukmu</h3>
+        <p class="desc">Jawab 5 pertanyaan. Lihat seberapa baik kamu mengenalku.</p>
+        <div id="quizBox"></div>
+      </div>
+
+      <!-- Game 4: Scratch card -->
+      <div class="game-card reveal">
+        <h3>Gosok Kartu</h3>
+        <p class="desc">Gosok kartu di bawah ini dengan mouse atau jari untuk membuka pesan tersembunyi.</p>
+        <div class="scratch-wrap" id="scratchWrap">
+          <div class="scratch-reveal" id="scratchReveal">Kamu adalah alasan aku tersenyum setiap hari. Terima kasih sudah ada.</div>
+          <canvas class="scratch-canvas" id="scratchCanvas" width="420" height="180"></canvas>
+        </div>
+        <div class="game-row" style="margin-top:14px;justify-content:center;">
+          <button class="btn ghost" id="scratchReset">Gosok Ulang</button>
+        </div>
+      </div>
+
+      <!-- Game 5: Spin wheel -->
+      <div class="game-card reveal">
+        <h3>Roda Pesan</h3>
+        <p class="desc">Putar roda dan lihat pesan apa yang akan kamu dapat hari ini.</p>
+        <div class="wheel-wrap">
+          <div class="wheel-pointer"></div>
+          <div class="wheel" id="wheel"></div>
+          <button class="btn" id="spinBtn">Putar</button>
+          <div class="wheel-result" id="wheelResult">Klik Putar</div>
+        </div>
+      </div>
+
+      <!-- Game 6: Compliment generator -->
+      <div class="game-card reveal">
+        <h3>Pesan Acak</h3>
+        <p class="desc">Klik tombol untuk mendapat satu pesan manis secara acak.</p>
+        <div class="comp-box" id="compBox">Klik tombol di bawah</div>
+        <div class="game-row" style="margin-top:14px;justify-content:center;">
+          <button class="btn" id="compBtn">Berikan Pesan</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SURPRISE -->
+  <section class="surprise">
+    <div class="container">
+      <h2>Satu hal terakhir</h2>
+      <p>Kalau kamu sampai di sini, artinya kamu sudah membaca semuanya. Terima kasih. Aku harap senyummu hari ini lebar, dan hatimu terasa hangat.</p>
+      <button class="btn" id="surpriseBtn">Klik untuk kejutan</button>
+      <div class="final-msg" id="finalMsg">Selamat ulang tahun, sayang. Aku mencintaimu, hari ini, besok, dan seterusnya.</div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="sig">dengan cinta</div>
+    <div>Dibuat khusus untukmu, dengan tulus.</div>
+  </footer>
+
+</div>
+
+<!-- MUSIC BAR -->
+<div class="music-bar paused" id="musicBar">
+  <div class="bars"><span></span><span></span><span></span><span></span></div>
+  <div class="label">Semua Aku Dirayakan - Nadin Amizah</div>
+  <button class="music-btn" id="musicBtn" aria-label="Putar musik">
+    <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+    <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+  </button>
+</div>
+
+<audio id="bgMusic" loop preload="auto">
+  <!-- GANTI LAGU: taruh file lagu di folder yang sama dan namai semua-aku-dirayakan.mp3 -->
+  <source src="https://files.catbox.moe/sq66tl.m4a" type="audio/mpeg">
+</audio>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <span class="close" id="lbClose">&times;</span>
+  <img id="lbImg" alt="">
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <span class="modal-close" id="modalClose">&times;</span>
+    <h3 id="modalTitle">Pesan</h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  // ---------- petals ----------
+  const petalSvg = '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2 C14 2,18 6,18 10 C18 14,14 18,10 18 C6 18,2 14,2 10 C2 6,6 2,10 2 Z" fill="#e8a8b3" opacity="0.7"/></svg>';
+  function createPetal() {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.innerHTML = petalSvg;
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (Math.random() * 6 + 7) + 's';
+    p.style.setProperty('--drift', (Math.random() * 120 - 60) + 'px');
+    document.getElementById('petals').appendChild(p);
+    setTimeout(() => p.remove(), 14000);
+  }
+  setInterval(createPetal, 900);
+
+  // ---------- typewriter letter ----------
+  const letterText = "Hari ini adalah harimu, dan aku ingin kamu tahu betapa berharganya kamu di hidupku. Setiap detik yang kita lewati adalah cerita yang tak akan pernah aku tukar. Terima kasih sudah menjadi rumah untuk pulang, dan alasan untuk tersenyum setiap hari. Semoga tahun ini penuh cinta, tawa, dan mimpi yang terwujud. Aku mencintaimu, selalu, tanpa syarat dan tanpa jeda.";
+  const tw = document.getElementById('typewriter');
+  let idx = 0;
+  function typeStep() {
+    if (idx < letterText.length) {
+      tw.innerHTML = letterText.slice(0, idx + 1) + '<span class="cursor"></span>';
+      idx++;
+      setTimeout(typeStep, 38);
+    } else {
+      tw.innerHTML = letterText;
+    }
+  }
+  const letterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { setTimeout(typeStep, 400); letterObserver.disconnect(); } });
+  }, { threshold: 0.3 });
+  letterObserver.observe(document.querySelector('.letter'));
+
+  // ---------- polaroids ----------
+  // =====================================================================
+  // GANTI FOTO DI SINI: taruh 4 foto kamu di folder yang SAMA dengan file ini,
+  // beri nama foto1.jpg, foto2.jpg, foto3.jpg, foto4.jpg (atau ubah nama di 'src').
+  // Kalau foto belum ada, otomatis tampil foto contoh (fallback).
+  // =====================================================================
+  const memories = [
+    { src: 'foto1.jpg', cap: 'ini waktu pertama kita main LUCUU tapii keliatan masih canggung whwhwe, darii awal ketemu kamu sudah cantik sekalii', date: '01' },
+    { src: 'foto2.jpg', cap: 'ini senyum kamu lucu sekaliiiiii superr duper menggemaskan kamu sudahh cantikk lucuu menggemaskan sekali kamu anggii🫶🏻🤍🤍', date: '02' },
+    { src: 'foto3.jpg', cap: 'ini first time photobooth hanip dan ditemani anggii WKHWHWJAJA TERIMKASII YAA SUDA MENJADI FIRST EXPERINCE AKUU, kitaa lanjutin withlist selanjutnyaa', date: '03' },
+    { src: 'foto4.jpg', cap: 'Tawa yang tidak pernah berhenti', date: '04' },
+  ];
+  const polWrap = document.getElementById('polaroids');
+  memories.forEach((m) => {
+    const rot = (Math.random() * 6 - 3).toFixed(2);
+    const el = document.createElement('div');
+    el.className = 'polaroid reveal';
+    el.style.setProperty('--rot', rot + 'deg');
+    el.innerHTML = '<span class="date">#' + m.date + '</span><img src="' + m.src + '" alt="' + m.cap + '" loading="lazy"><div class="cap">' + m.cap + '</div>';
+    const pimg = el.querySelector('img');
+    pimg.onerror = function () { this.onerror = null; this.src = m.fallback; };
+    el.addEventListener('click', () => openLightbox(pimg.src));
+    polWrap.appendChild(el);
+  });
+
+  // ---------- reasons ----------
+  const reasons = [
+    'Kamu selalu mendengarkan, bahkan saat aku tidak tahu cara menjelaskan.',
+    'Cara kamu tertawa membuatku ikut tersenyum setiap kali.',
+    'Kamu tidak menuntut kesempurnaan, hanya kejujuran.',
+    'Saat aku lelah, kamu adalah tempatku berhenti sejenak.',
+    'Kamu mengingat hal-hal kecil yang aku sendiri lupa.',
+    'Kamu membuat hari biasa terasa istimewa.',
+    'Keberanianmu menghadapi hari-hari sulit menginspirasiku.',
+    'Kamu tidak pernah membuatku merasa sendirian.',
+    'Setiap cerita yang kamu bagikan membuatku ingin mengenalmu lebih dalam.',
+    'Kamu adalah keputusan terbaik yang pernah aku buat.',
+    'Kehadiranmu membuat rumah terasa seperti rumah.',
+    'Aku mencintaimu, bukan karena sempurna, tapi karena kamu adalah kamu.',
+  ];
+  const rWrap = document.getElementById('reasons');
+  reasons.forEach((r, i) => {
+    const el = document.createElement('div');
+    el.className = 'reason reveal';
+    el.innerHTML =
+      '<div class="reason-inner">' +
+        '<div class="reason-face reason-front"><div class="num">' + (i + 1) + '</div><div class="hint">klik untuk membuka</div></div>' +
+        '<div class="reason-face reason-back"><p>' + r + '</p></div>' +
+      '</div>';
+    el.addEventListener('click', () => el.classList.toggle('flipped'));
+    rWrap.appendChild(el);
+  });
+
+  // ---------- envelope -> modal ----------
+  const envelope = document.getElementById('envelope');
+  envelope.addEventListener('click', () => {
+    openModal('Pesan Untukmu', '<p>Nafira Anggi,</p><p>Kamu adalah orang yang paling berharga yang saat ini yang aku miliki. Terimakasih sudah lahir, dan terimkasih sudah mengajariku banyak hal hal yang baik yaa, aku selalu bersyukur dan bangga tak pernah henti bisa bersama anggii.</p><p style="text-align:right;font-style:italic;color:var(--rose);">- selalu, aku</p>');
+  });
+
+  // ---------- lightbox ----------
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  function openLightbox(src) { lbImg.src = src; lb.classList.add('open'); }
+  document.getElementById('lbClose').addEventListener('click', () => lb.classList.remove('open'));
+  lb.addEventListener('click', (e) => { if (e.target === lb) lb.classList.remove('open'); });
+
+  // ---------- modal ----------
+  const modal = document.getElementById('modal');
+  function openModal(title, html) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = html;
+    modal.classList.add('open');
+  }
+  document.getElementById('modalClose').addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+
+  // ---------- music ----------
+  const audio = document.getElementById('bgMusic');
+  const musicBtn = document.getElementById('musicBtn');
+  const musicBar = document.getElementById('musicBar');
+  const playIcon = document.getElementById('playIcon');
+  const pauseIcon = document.getElementById('pauseIcon');
+  function setPlaying(playing) {
+    playIcon.style.display = playing ? 'none' : 'block';
+    pauseIcon.style.display = playing ? 'block' : 'none';
+    musicBar.classList.toggle('paused', !playing);
+  }
+  musicBtn.addEventListener('click', () => {
+    if (audio.paused) { audio.play().then(() => setPlaying(true)).catch(() => {}); }
+    else { audio.pause(); setPlaying(false); }
+  });
+  audio.addEventListener('play', () => setPlaying(true));
+  audio.addEventListener('pause', () => setPlaying(false));
+  document.addEventListener('click', function once() {
+    if (audio.paused) { audio.play().then(() => setPlaying(true)).catch(() => {}); }
+    document.removeEventListener('click', once);
+  }, { once: true });
+
+  // ---------- surprise ----------
+  const surpriseBtn = document.getElementById('surpriseBtn');
+  const finalMsg = document.getElementById('finalMsg');
+  surpriseBtn.addEventListener('click', () => {
+    const colors = ['#b05a6b','#c9a96e','#e8a8b3','#f2e3e7','#8a3f4f'];
+    for (let i = 0; i < 90; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.setProperty('--cx', (Math.random() * 200 - 100) + 'px');
+      c.style.animationDelay = (Math.random() * 0.4) + 's';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3200);
+    }
+    finalMsg.classList.add('show');
+    surpriseBtn.style.display = 'none';
+  });
+
+
+  // ===================== MINI GAMES =====================
+
+  // ---- Game 1: Catch hearts ----
+  const catchArea = document.getElementById('catchArea');
+  const catchOverlay = document.getElementById('catchOverlay');
+  const catchScoreEl = document.getElementById('catchScore');
+  const catchTimeEl = document.getElementById('catchTime');
+  const catchBestEl = document.getElementById('catchBest');
+  const catchStartBtn = document.getElementById('catchStart');
+  let catchScore = 0, catchTime = 20, catchTimer = null, catchSpawn = null, catchBest = 0, catchRunning = false;
+  const heartSvg = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-7.5-4.35-10-8.5C-0.5 8.5 2 4 6.5 4c2.2 0 3.8 1.2 5.5 3 1.7-1.8 3.3-3 5.5-3C22 4 24.5 8.5 22 12.5 19.5 16.65 12 21 12 21z" fill="#b05a6b"/></svg>';
+  function spawnCatchHeart() {
+    if (!catchRunning) return;
+    const h = document.createElement('div');
+    h.className = 'catch-heart';
+    h.innerHTML = heartSvg;
+    h.style.left = (Math.random() * (catchArea.clientWidth - 40)) + 'px';
+    h.style.animationDuration = (Math.random() * 1.2 + 2) + 's';
+    h.addEventListener('click', () => {
+      if (!catchRunning) return;
+      catchScore++;
+      catchScoreEl.textContent = catchScore;
+      h.remove();
+    });
+    h.addEventListener('animationend', () => h.remove());
+    catchArea.appendChild(h);
+  }
+  catchStartBtn.addEventListener('click', () => {
+    if (catchRunning) return;
+    catchRunning = true;
+    catchScore = 0; catchTime = 20;
+    catchScoreEl.textContent = 0; catchTimeEl.textContent = 20;
+    catchOverlay.classList.add('hidden');
+    // clear old hearts
+    catchArea.querySelectorAll('.catch-heart').forEach(e => e.remove());
+    catchSpawn = setInterval(spawnCatchHeart, 600);
+    catchTimer = setInterval(() => {
+      catchTime--;
+      catchTimeEl.textContent = catchTime;
+      if (catchTime <= 0) {
+        clearInterval(catchTimer); clearInterval(catchSpawn);
+        catchRunning = false;
+        if (catchScore > catchBest) { catchBest = catchScore; catchBestEl.textContent = catchBest; }
+        catchOverlay.classList.remove('hidden');
+        catchOverlay.innerHTML = '<p style="font-family:Playfair Display,serif;font-style:italic;color:var(--rose-deep);font-size:1.2rem;">Waktu habis! Skor kamu: ' + catchScore + '</p>';
+      }
+    }, 1000);
+  });
+
+  // ---- Game 2: Memory match ----
+  const memWords = ['Senyum','Tawa','Rindu','Cinta','Mimpi','Pulang'];
+  const memGrid = document.getElementById('memGrid');
+  const memMovesEl = document.getElementById('memMoves');
+  const memPairsEl = document.getElementById('memPairs');
+  let memFirst = null, memSecond = null, memLock = false, memMoves = 0, memPairs = 0, memCards = [];
+  function buildMemory() {
+    memGrid.innerHTML = '';
+    memFirst = null; memSecond = null; memLock = false; memMoves = 0; memPairs = 0;
+    memMovesEl.textContent = 0; memPairsEl.textContent = 0;
+    const deck = [...memWords, ...memWords].sort(() => Math.random() - 0.5);
+    memCards = deck.map((w, i) => {
+      const card = document.createElement('div');
+      card.className = 'mem-card';
+      card.dataset.word = w;
+      card.innerHTML = '<div class="mem-inner"><div class="mem-face mem-front">?</div><div class="mem-face mem-back">' + w + '</div></div>';
+      card.addEventListener('click', () => flipMem(card));
+      memGrid.appendChild(card);
+      return card;
+    });
+  }
+  function flipMem(card) {
+    if (memLock) return;
+    if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+    card.classList.add('flipped');
+    if (!memFirst) { memFirst = card; return; }
+    memSecond = card;
+    memMoves++; memMovesEl.textContent = memMoves;
+    memLock = true;
+    setTimeout(() => {
+      if (memFirst.dataset.word === memSecond.dataset.word) {
+        memFirst.classList.add('matched'); memSecond.classList.add('matched');
+        memPairs++; memPairsEl.textContent = memPairs;
+        if (memPairs === memWords.length) {
+          setTimeout(() => { alert('Selamat! Semua pasangan ditemukan dalam ' + memMoves + ' langkah.'); }, 300);
+        }
+      } else {
+        memFirst.classList.remove('flipped'); memSecond.classList.remove('flipped');
+      }
+      memFirst = null; memSecond = null; memLock = false;
+    }, 800);
+  }
+  document.getElementById('memStart').addEventListener('click', buildMemory);
+  buildMemory();
+
+  // ---- Game 3: Quiz ----
+  const quizData = [
+    { q: 'Apa yang paling aku suka dari kamu?', opts: ['Senyummu', 'Suaramu', 'Caramu mendengarkan', 'Semua di atas'], a: 3 },
+    { q: 'Momen favorit kita bersama?', opts: ['Pesan larut malam', 'Jalan-jalan kecil', 'Saat kamu tertawa', 'Semua momen'], a: 3 },
+    { q: 'Apa yang aku sebut kamu?', opts: ['Sayang', 'Cinta', 'Kamu', 'Semua panggilan'], a: 0 },
+    { q: 'Kapan aku paling bersyukur?', opts: ['Pagi hari', 'Saat bersamamu', 'Malam hari', 'Setiap saat'], a: 3 },
+    { q: 'Apa harapanku untukmu?', opts: ['Bahagia', 'Sehat', 'Mimpi terwujud', 'Semua di atas'], a: 3 },
+  ];
+  const quizBox = document.getElementById('quizBox');
+  let qIndex = 0, qScore = 0;
+  function renderQuiz() {
+    if (qIndex >= quizData.length) {
+      quizBox.innerHTML = '<div class="quiz-result">Skor kamu: ' + qScore + ' dari ' + quizData.length + '. ' + (qScore === quizData.length ? 'Sempurna. Kamu mengenalku dengan baik.' : 'Masih ada yang bisa kamu pelajari tentang aku. Tapi itu oke, kita punya waktu.') + '</div><button class="btn" id="quizRestart" style="margin-top:14px;">Main Lagi</button>';
+      document.getElementById('quizRestart').addEventListener('click', () => { qIndex = 0; qScore = 0; renderQuiz(); });
+      return;
+    }
+    const q = quizData[qIndex];
+    quizBox.innerHTML = '<div class="quiz-q">' + (qIndex + 1) + '. ' + q.q + '</div><div class="quiz-opts">' + q.opts.map((o, i) => '<button class="quiz-opt" data-i="' + i + '">' + o + '</button>').join('') + '</div>';
+    quizBox.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const i = parseInt(btn.dataset.i);
+        quizBox.querySelectorAll('.quiz-opt').forEach(b => b.classList.add('disabled'));
+        if (i === q.a) { btn.classList.add('correct'); qScore++; }
+        else { btn.classList.add('wrong'); quizBox.querySelectorAll('.quiz-opt')[q.a].classList.add('correct'); }
+        setTimeout(() => { qIndex++; renderQuiz(); }, 1100);
+      });
+    });
+  }
+  renderQuiz();
+
+  // ---- Game 4: Scratch card ----
+  const scratchCanvas = document.getElementById('scratchCanvas');
+  const scratchCtx = scratchCanvas.getContext('2d');
+  function initScratch() {
+    scratchCtx.globalCompositeOperation = 'source-over';
+    scratchCtx.fillStyle = '#c9c9c9';
+    scratchCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+    // pattern dots
+    scratchCtx.fillStyle = '#a0a0a0';
+    for (let i = 0; i < 200; i++) {
+      scratchCtx.beginPath();
+      scratchCtx.arc(Math.random() * scratchCanvas.width, Math.random() * scratchCanvas.height, Math.random() * 2 + 1, 0, Math.PI * 2);
+      scratchCtx.fill();
+    }
+    scratchCtx.fillStyle = '#555';
+    scratchCtx.font = 'bold 16px Inter, sans-serif';
+    scratchCtx.textAlign = 'center';
+    scratchCtx.fillText('Gosok di sini', scratchCanvas.width / 2, scratchCanvas.height / 2);
+    scratchCtx.globalCompositeOperation = 'destination-out';
+  }
+  initScratch();
+  let scratching = false;
+  function scratchAt(x, y) {
+    scratchCtx.beginPath();
+    scratchCtx.arc(x, y, 18, 0, Math.PI * 2);
+    scratchCtx.fill();
+  }
+  function getPos(e) {
+    const rect = scratchCanvas.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (cx - rect.left) * (scratchCanvas.width / rect.width), y: (cy - rect.top) * (scratchCanvas.height / rect.height) };
+  }
+  scratchCanvas.addEventListener('mousedown', (e) => { scratching = true; const p = getPos(e); scratchAt(p.x, p.y); });
+  scratchCanvas.addEventListener('mousemove', (e) => { if (!scratching) return; const p = getPos(e); scratchAt(p.x, p.y); });
+  scratchCanvas.addEventListener('mouseup', () => scratching = false);
+  scratchCanvas.addEventListener('mouseleave', () => scratching = false);
+  scratchCanvas.addEventListener('touchstart', (e) => { scratching = true; const p = getPos(e); scratchAt(p.x, p.y); e.preventDefault(); });
+  scratchCanvas.addEventListener('touchmove', (e) => { if (!scratching) return; const p = getPos(e); scratchAt(p.x, p.y); e.preventDefault(); });
+  scratchCanvas.addEventListener('touchend', () => scratching = false);
+  document.getElementById('scratchReset').addEventListener('click', initScratch);
+
+  // ---- Game 5: Spin wheel ----
+  const wheel = document.getElementById('wheel');
+  const wheelResult = document.getElementById('wheelResult');
+  const spinBtn = document.getElementById('spinBtn');
+  const wheelMsgs = [
+    'Hari ini kamu pantas mendapat pelukan hangat.',
+    'Senyummu adalah hal terbaik yang aku lihat hari ini.',
+    'Kamu lebih kuat dari yang kamu kira.',
+    'Sesuatu yang indah sedang menantimu.',
+    'Kamu dicintai, lebih dari yang kamu tahu.',
+    'Hari ini adalah awal dari sesuatu yang baik.',
+  ];
+  // labels on wheel
+  const labelsWrap = document.createElement('div');
+  labelsWrap.className = 'wheel-labels';
+  wheelMsgs.forEach((m, i) => {
+    const span = document.createElement('span');
+    const angle = (i * 60) + 30;
+    span.style.transform = 'rotate(' + angle + 'deg) translate(0, -95px) rotate(90deg)';
+    span.textContent = 'Pesan ' + (i + 1);
+    labelsWrap.appendChild(span);
+  });
+  wheel.appendChild(labelsWrap);
+  let wheelSpinning = false;
+  spinBtn.addEventListener('click', () => {
+    if (wheelSpinning) return;
+    wheelSpinning = true;
+    spinBtn.disabled = true;
+    const extra = Math.floor(Math.random() * 6) * 60;
+    const turns = 5 * 360 + extra;
+    wheel.style.transform = 'rotate(' + (turns) + 'deg)';
+    setTimeout(() => {
+      const idx = Math.round((360 - (turns % 360)) / 60) % 6;
+      wheelResult.textContent = wheelMsgs[idx];
+      wheelSpinning = false;
+      spinBtn.disabled = false;
+    }, 4200);
+  });
+
+  // ---- Game 6: Compliment generator ----
+  const compliments = [
+    'Kamu membuat hari-hari biasa terasa istimewa.',
+    'Aku bersyukur setiap kali memikirkanmu.',
+    'Kehadiranmu adalah hadiah terbaik dalam hidupku.',
+    'Kamu adalah alasan aku tersenyum sebelum tidur.',
+    'Bersamamu, aku merasa cukup.',
+    'Kamu adalah versi terbaik dari rumah.',
+    'Aku mencintaimu, tidak hanya hari ini, tapi setiap hari.',
+    'Kamu membuatku ingin menjadi orang yang lebih baik.',
+  ];
+  document.getElementById('compBtn').addEventListener('click', () => {
+    const msg = compliments[Math.floor(Math.random() * compliments.length)];
+    const box = document.getElementById('compBox');
+    box.style.opacity = 0;
+    setTimeout(() => { box.textContent = msg; box.style.opacity = 1; }, 250);
+  });
+
+  // ---------- scroll reveal ----------
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
